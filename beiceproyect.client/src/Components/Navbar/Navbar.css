@@ -1,0 +1,94 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%; /* Ocupa todo el ancho */
+    background-color: #444; /* Fondo oscuro */
+    color: white;
+    padding: 19px 20px;
+    z-index: 10; /* Se asegura de estar encima de otros elementos */
+}
+
+.navbar-right {
+    list-style: none;
+    margin: 0;
+    padding-right: 45px;
+    display: flex;
+}
+
+.menu-icon {
+    display: none; /* Escondido por defecto */
+    cursor: pointer;
+    font-size: 24px;
+    color: white;
+}
+
+.navbar-right li {
+    margin-left: 25px;
+}
+
+.title {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.navbar-title {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    font-size: 25px;
+}
+
+.navbar-right a {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 21px;
+    height: 100%;
+}
+
+.navbar-right a:hover {
+    transition: all 0.2s ease-out;
+    border-bottom: 4px solid #fff;
+}
+
+.navbar-right.active {
+  display: flex;
+  flex-direction: column; /* Cambia a diseño vertical */
+  position: absolute;
+  top: 75px;
+  right: 0;
+  background-color: #333;
+  width: 100%;
+  text-align: center;
+  padding: 20px 0;
+  z-index: 999;
+}
+
+.navbar-right.active li {
+  margin: 10px 0;
+}
+
+/* Vista responsiva */
+@media screen and (max-width: 768px) {
+    .menu-icon {
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 0;
+        transform: translate(-100%, 40%);
+        font-size: 1.8rem;
+        cursor: pointer;
+        padding-right: 20px;
+    }
+
+    .navbar-right {
+        display: none; /* Oculta los links por defecto */
+    }
+}

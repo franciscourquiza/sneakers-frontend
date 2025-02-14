@@ -1,0 +1,15 @@
+.footer-container {
+    display: flex;
+    background-color: #444; /* Negro no tan oscuro */
+    color: white;
+    text-align: center; /* Centra el texto */
+    justify-content:center;
+    align-items:center;
+    padding: 45px 0;
+    width: 100%; /* Ocupa todo el ancho */
+    z-index: 1000; /* Asegura que esté sobre otros elementos */
+}
+
+p {
+    margin-bottom: 0rem;
+}

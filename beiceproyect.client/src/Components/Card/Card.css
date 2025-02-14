@@ -1,0 +1,21 @@
+.card-container {
+  width: 250px; /* Ajusta el tamaño cuadrado */
+  height: 450px;
+  border: 2px solid #ddd; /* Borde sutil */
+  border-radius: 10px; /* Esquinas redondeadas */
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.1); /* Sombra para efecto de carta */
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.card-image {
+    width:200px;
+    height:200px;
+    border-radius:6px;
+}
+

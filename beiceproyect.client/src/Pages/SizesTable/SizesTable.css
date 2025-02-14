@@ -1,0 +1,20 @@
+.image {
+    height: 750px;
+    width: 530px;
+    padding-top: 30px;
+    padding-bottom: 80px;
+}
+
+.container{
+    display:flex;
+    justify-content:center;
+}
+
+@media (max-width: 768px) {
+    .image {
+        padding-top: 40px;
+        padding-bottom: 40px; 
+        height: 490px;
+        width: 360px;
+    }
+}
