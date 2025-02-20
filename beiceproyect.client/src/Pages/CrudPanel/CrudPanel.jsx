@@ -165,7 +165,7 @@ const CrudPanel = ({ setIsAuthenticated }) => {
                         <input
                             type="number"
                             name="price"
-                            placeholder="Precio"
+                            placeholder="Precio (Ej: 100.000) usar puntos cada 3 digitos"
                             value={newSneaker.price}
                             onChange={handleInputChange}
                             className="form-input"
@@ -173,7 +173,7 @@ const CrudPanel = ({ setIsAuthenticated }) => {
                         <input
                             type="text"
                             name="sizes"
-                            placeholder="Talles (separados por coma)"
+                            placeholder="Talles en EUR (separados por coma, Ejemplo: 40, 41, 42)"
                             value={newSneaker.sizes}
                             onChange={handleInputChange}
                             className="form-input"
@@ -181,7 +181,7 @@ const CrudPanel = ({ setIsAuthenticated }) => {
                         <input
                             type="url"
                             name="imageUrl"
-                            placeholder="URL de la imagen (Link)"
+                            placeholder="URL de la imagen (Link, usar resoluciones cuadradas en lo posible, 400px X 400px por ejemplo)"
                             value={newSneaker.imageUrl}
                             onChange={handleInputChange}
                             className="form-input"

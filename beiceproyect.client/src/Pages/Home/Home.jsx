@@ -97,7 +97,7 @@ const Home = () => {
                     <option value="">Seleccionar talle</option>
                     {Array.from({ length: 11 }, (_, i) => 35 + i).map((t) => (
                         <option key={t} value={t}>
-                            {t}
+                            {t} EUR
                         </option>
                     ))}
                 </select>

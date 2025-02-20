@@ -34,14 +34,11 @@ const SneakerDetail = () => {
             </div>
             <div className="info-container">
                 <h2>{sneaker.name}</h2>
-                <p className="price">Precio: ${sneaker.price} ARS</p>
+                <p className="price">Precio: ${sneaker.price.toFixed(3)} ARS</p>
                 <div className="sizes">
                     {sneaker.sizes.map((size) => (
-                        <div
-                            key={size.size}
-                            className="size-badge in-stock"
-                        >
-                            {`En stock Talle ${size.size}`}
+                        <div key={size.size} className="size-badge in-stock">
+                            {`En stock Talle ${size.size} EUR (${size.size - 1} ARG)`}
                         </div>
                     ))}
                 </div>

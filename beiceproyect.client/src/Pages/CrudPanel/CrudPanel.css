@@ -15,8 +15,8 @@ h3 {
 }
 
 .add-form {
-    width: 100%;
-    max-width: 400px;
+    width: 70%;
+    /*max-width: 400px;*/
     margin: 20px auto;
     padding: 20px;
     background: #f9f9f9;
