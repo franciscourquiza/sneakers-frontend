@@ -9,6 +9,7 @@ const CrudCard = ({ zapatilla, onUpdate }) => {
         price: zapatilla.price,
         imageUrl: zapatilla.imageUrl,
         sizes: zapatilla.sizes.map(s => s.size).join(", "),
+        isInDiscount: zapatilla.isInDiscount // Incluir la propiedad de liquidación
     });
 
     const handleEditClick = () => {
@@ -22,11 +23,20 @@ const CrudCard = ({ zapatilla, onUpdate }) => {
             price: zapatilla.price,
             imageUrl: zapatilla.imageUrl,
             sizes: zapatilla.sizes.map(s => s.size).join(", "),
+            isInDiscount: zapatilla.isInDiscount
         });
     };
 
     const handleInputChange = (e) => {
         setEditedData({ ...editedData, [e.target.name]: e.target.value });
+    };
+
+    // Manejo específico para el checkbox
+    const handleCheckboxChange = (e) => {
+        setEditedData({
+            ...editedData,
+            isInDiscount: e.target.checked
+        });
     };
 
     const handleSaveEdit = async () => {
@@ -40,14 +50,15 @@ const CrudCard = ({ zapatilla, onUpdate }) => {
                     name: editedData.name,
                     price: parseFloat(editedData.price),
                     imageUrl: editedData.imageUrl,
-                    sizes: editedData.sizes.split(",").map(size => parseInt(size.trim())) // Convertir a número
+                    sizes: editedData.sizes.split(",").map(size => parseInt(size.trim())),
+                    isInDiscount: editedData.isInDiscount  // Enviar la propiedad de liquidación
                 }),
             });
 
             if (!response.ok) {
                 throw new Error("Error al actualizar la sneaker");
             }
-            
+
             alert("Sneaker actualizada correctamente.");
             onUpdate();
             setIsEditing(false);
@@ -72,7 +83,7 @@ const CrudCard = ({ zapatilla, onUpdate }) => {
             if (!response.ok) {
                 throw new Error("Error al eliminar la sneaker");
             }
-            
+
             alert("Sneaker eliminada correctamente.");
             onUpdate();
         } catch (error) {
@@ -87,10 +98,47 @@ const CrudCard = ({ zapatilla, onUpdate }) => {
 
             {isEditing ? (
                 <div className="edit-form">
-                    <input type="text" name="name" placeholder="Nombre" value={editedData.name} onChange={handleInputChange} />
-                    <input type="number" name="price" placeholder="Precio (Ej: '100.000') usar puntos" value={editedData.price} onChange={handleInputChange} />
-                    <input type="text" name="sizes" placeholder="Talles en EUR (separados por coma)"  value={editedData.sizes} onChange={handleInputChange} />
-                    <input type="url" name="imageUrl" placeholder="URL de la imagen (Link, usar resoluciones cuadradas en lo posible)" value={editedData.imageUrl} onChange={handleInputChange} />
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Nombre"
+                        value={editedData.name}
+                        onChange={handleInputChange}
+                    />
+                    <input
+                        type="number"
+                        name="price"
+                        placeholder="Precio (Ej: '100.000') usar puntos"
+                        value={editedData.price}
+                        onChange={handleInputChange}
+                    />
+                    <input
+                        type="text"
+                        name="sizes"
+                        placeholder="Talles en EUR (separados por coma)"
+                        value={editedData.sizes}
+                        onChange={handleInputChange}
+                    />
+                    <input
+                        type="url"
+                        name="imageUrl"
+                        placeholder="URL de la imagen (Link, usar resoluciones cuadradas en lo posible)"
+                        value={editedData.imageUrl}
+                        onChange={handleInputChange}
+                    />
+
+                    {/* Checkbox para Producto en Liquidación */}
+                    <div className="form-input">
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="isInDiscount"
+                                checked={editedData.isInDiscount}
+                                onChange={handleCheckboxChange}
+                            />
+                            Producto en Liquidacion
+                        </label>
+                    </div>
 
                     <div className="card-buttons">
                         <button className="btn btn-save" onClick={handleSaveEdit}>Guardar</button>
@@ -101,12 +149,12 @@ const CrudCard = ({ zapatilla, onUpdate }) => {
                 <>
                     <h4 className="card-name">{zapatilla.name}</h4>
                     <h5 className="card-price">${zapatilla.price.toFixed(3)} ARS</h5>
-                        <div className="card-sizes">
-                            <p>Talles disponibles:</p>
-                            {zapatilla.sizes.map(s => (
-                                <p key={s.size}>{s.size} EUR ({s.size - 1} ARG)</p>
-                            ))}
-                        </div>
+                    <div className="card-sizes">
+                        <p>Talles disponibles:</p>
+                        {zapatilla.sizes.map(s => (
+                            <p key={s.size}>{s.size} EUR ({s.size - 1} ARG)</p>
+                        ))}
+                    </div>
 
                     <div className="card-buttons">
                         <button className="btn btn-edit" onClick={handleEditClick}>Editar</button>

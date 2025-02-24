@@ -1,18 +1,17 @@
 import { useState, useEffect } from 'react';
-import './Home.css';
+import './DiscountsPage.css';
 import Card from '../../Components/Card/Card';
 
 
-const Home = () => {
+const DiscountsPage = () => {
     const [filteredResults, setFilteredResults] = useState([]);
     const [allSneakers, setAllSneakers] = useState([]);
     const [name, setName] = useState("");
-    const [size, setSize] = useState("");
 
- 
+
     const fetchAllSneakers = async () => {
         try {
-            const response = await fetch('https://beiceservice.azurewebsites.net/api/Sneaker/GetAllNoDiscount');
+            const response = await fetch('https://beiceservice.azurewebsites.net/api/Sneaker/GetAllInDiscount');
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
@@ -23,26 +22,13 @@ const Home = () => {
             console.error("Error fetching all sneakers:", error);
         }
     };
-  
+
 
     const fetchSneakersByName = async (name) => {
         try {
-            const response = await fetch('https://beiceservice.azurewebsites.net/api/Sneaker/GetByName?name=${name}');
+            const response = await fetch('https://beiceservice.azurewebsites.net/api/Sneaker/GetByNameInDiscount?name=${name}');
             if (!response.ok) {
-                throw new Error("HTTP Error! Status: ${response.status}");
-            }
-            const data = await response.json();
-            setFilteredResults(data);
-        } catch (error) {
-            console.error("Error al traer las zapatillas:", error);
-        }
-    }
-
-    const fetchSneakersBySize = async (size) => {
-        try {
-            const response = await fetch('https://beiceservice.azurewebsites.net/api/Sneaker/GetBySize?size=${size}');
-            if (!response.ok) {
-                throw new Error("HTTP Error! Status: ${response.status}");
+                throw new Error(`HTTP Error! Status: ${response.status}`);
             }
             const data = await response.json();
             setFilteredResults(data);
@@ -64,12 +50,6 @@ const Home = () => {
             );
         }
 
-        if (size) {
-            filteredData = filteredData.filter((zapatilla) =>
-                zapatilla.sizes.some((s) => s.size === parseInt(size))
-            );
-        }
-
         setFilteredResults(filteredData); // Update filtered results based on name and size
     };
 
@@ -87,21 +67,6 @@ const Home = () => {
                     onChange={(e) => setName(e.target.value)}
                     className="form-control mb-2 mb-sm-0 me-sm-2"
                 />
-
-                {/* Barra de búsqueda por talle */}
-                <select
-                    value={size}
-                    onChange={(e) => setSize(e.target.value)}
-                    className="form-select mb-2 mb-sm-0 me-sm-2"
-                >
-                    <option value="">Seleccionar talle</option>
-                    {Array.from({ length: 11 }, (_, i) => 35 + i).map((t) => (
-                        <option key={t} value={t}>
-                            {t} EUR
-                        </option>
-                    ))}
-                </select>
-                
 
                 {/* Botón para filtrar */}
                 <button
@@ -122,4 +87,4 @@ const Home = () => {
     )
 }
 
-export default Home;
+export default DiscountsPage;

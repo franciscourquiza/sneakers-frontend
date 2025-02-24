@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import SizesTable from '../src/Pages/SizesTable/SizesTable';
 import AdminPanel from '../src/Pages/AdminPanel/AdminPanel';
 import SneakerDetail from '../src/Pages/SneakerDetail/SneakerDetail';
+import DiscountsPage from '../src/Pages/DiscountsPage/DiscountsPage';
 import PageNotFound from '../src/Pages/PageNotFound/PageNotFound';
 import Navbar from './Components/Navbar/Navbar';
 import Footer from './Components/Footer/Footer';
@@ -27,6 +28,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<Navigate to="/home" />} />
                 <Route path="/home" element={<Home />} />
+                <Route path="/discounts" element={<DiscountsPage />} />
                 <Route path="/sneaker/:id" element={<SneakerDetail />} />
                 <Route path="/sizestable" element={<SizesTable />} />
                 <Route path="/adminpanel" element={<AdminPanel setIsAuthenticated={setIsAuthenticated} />} />

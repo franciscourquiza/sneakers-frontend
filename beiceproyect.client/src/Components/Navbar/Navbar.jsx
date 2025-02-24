@@ -24,6 +24,7 @@ const Navbar = () => {
             <div>
                 <ul className={click ? "navbar-right active" : "navbar-right"}>
                     <li><Link to="/home" onClick={closeMobileMenu}>Zapatillas</Link></li>
+                    <li><Link to="/discounts" onClick={closeMobileMenu}>Liquidacion</Link></li>
                     <li><Link to="/sizestable" onClick={closeMobileMenu}>Tabla de Talles</Link></li>
                     <li><Link to="/adminpanel" onClick={closeMobileMenu}>Panel</Link></li>
                 </ul>
