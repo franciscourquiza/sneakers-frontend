@@ -55,7 +55,7 @@ const AdminPanel = ({ setIsAuthenticated }) => {
         if (!valid) return;
 
         try {
-            const response = await fetch("https://beiceservice.azurewebsites.net/api/Authentication/Login", {
+            const response = await fetch("https://bei-ice-api.azurewebsites.net/api/Authentication/Login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),

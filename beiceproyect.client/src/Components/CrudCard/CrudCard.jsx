@@ -41,7 +41,7 @@ const CrudCard = ({ zapatilla, onUpdate }) => {
 
     const handleSaveEdit = async () => {
         try {
-            const response = await fetch(`https://beiceservice.azurewebsites.net/api/Sneaker/EditById?id=${zapatilla.id}`, {
+            const response = await fetch(`https://bei-ice-api.azurewebsites.net/api/Sneaker/EditById?id=${zapatilla.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -73,7 +73,7 @@ const CrudCard = ({ zapatilla, onUpdate }) => {
         if (!confirmDelete) return;
 
         try {
-            const response = await fetch(`https://beiceservice.azurewebsites.net/api/Sneaker/DeleteById?id=${zapatilla.id}`, {
+            const response = await fetch(`https://bei-ice-api.azurewebsites.net/api/Sneaker/DeleteById?id=${zapatilla.id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

@@ -9,7 +9,7 @@ const SneakerDetail = () => {
     useEffect(() => {
         const fetchSneaker = async () => {
             try {
-                const response = await fetch(`https://beiceservice.azurewebsites.net/api/Sneaker/GetById?id=${id}`);
+                const response = await fetch(`https://bei-ice-api.azurewebsites.net/api/Sneaker/GetById?id=${id}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }

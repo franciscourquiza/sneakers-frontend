@@ -12,7 +12,7 @@ const Home = () => {
  
     const fetchAllSneakers = async () => {
         try {
-            const response = await fetch('https://beiceservice.azurewebsites.net/api/Sneaker/GetAllNoDiscount');
+            const response = await fetch('https://bei-ice-api.azurewebsites.net/api/Sneaker/GetAllNoDiscount');
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
@@ -27,7 +27,7 @@ const Home = () => {
 
     const fetchSneakersByName = async (name) => {
         try {
-            const response = await fetch('https://beiceservice.azurewebsites.net/api/Sneaker/GetByName?name=${name}');
+            const response = await fetch('https://bei-ice-api.azurewebsites.net/api/Sneaker/GetByName?name=${name}');
             if (!response.ok) {
                 throw new Error("HTTP Error! Status: ${response.status}");
             }
@@ -40,7 +40,7 @@ const Home = () => {
 
     const fetchSneakersBySize = async (size) => {
         try {
-            const response = await fetch('https://beiceservice.azurewebsites.net/api/Sneaker/GetBySize?size=${size}');
+            const response = await fetch('https://bei-ice-api.azurewebsites.net/api/Sneaker/GetBySize?size=${size}');
             if (!response.ok) {
                 throw new Error("HTTP Error! Status: ${response.status}");
             }
