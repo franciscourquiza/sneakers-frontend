@@ -29,7 +29,7 @@ const CrudPanel = ({ setIsAuthenticated }) => {
 
     const fetchAllSneakers = async () => {
         try {
-            const response = await fetch(`https://bei-ice-api.azurewebsites.net/api/Sneaker/GetAll`);
+            const response = await fetch(`https://sneakers-backend-production.up.railway.app/api/Sneaker/GetAll`);
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
@@ -44,7 +44,7 @@ const CrudPanel = ({ setIsAuthenticated }) => {
 
     const fetchSneakersByName = async (name) => {
         try {
-            const response = await fetch(`https://bei-ice-api.azurewebsites.net/api/Sneaker/GetByName?name=${name}`);
+            const response = await fetch(`https://sneakers-backend-production.up.railway.app/api/Sneaker/GetByName?name=${name}`);
             if (!response.ok) {
                 throw new Error("HTTP Error! Status: ${response.status}");
             }
@@ -57,7 +57,7 @@ const CrudPanel = ({ setIsAuthenticated }) => {
 
     const fetchSneakersBySize = async (size) => {
         try {
-            const response = await fetch(`https://bei-ice-api.azurewebsites.net/api/Sneaker/GetBySize?size=${size}`);
+            const response = await fetch(`https://sneakers-backend-production.up.railway.app/api/Sneaker/GetBySize?size=${size}`);
             if (!response.ok) {
                 throw new Error("HTTP Error! Status: ${response.status}");
             }
@@ -122,7 +122,7 @@ const CrudPanel = ({ setIsAuthenticated }) => {
 
     const handleSaveAdd = async () => {
         try {
-            const response = await fetch(`https://bei-ice-api.azurewebsites.net/api/Sneaker/Create`, {
+            const response = await fetch(`https://sneakers-backend-production.up.railway.app/api/Sneaker/Create`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
