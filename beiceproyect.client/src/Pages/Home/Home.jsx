@@ -2,84 +2,51 @@ import { useState, useEffect } from 'react';
 import './Home.css';
 import Card from '../../Components/Card/Card';
 
-
 const Home = () => {
     const [filteredResults, setFilteredResults] = useState([]);
-    const [allSneakers, setAllSneakers] = useState([]);
+    const [allProducts, setAllProducts] = useState([]);
     const [name, setName] = useState("");
     const [size, setSize] = useState("");
 
- 
-    const fetchAllSneakers = async () => {
+    const fetchAllProducts = async () => {
         try {
             const response = await fetch('https://sneakers-backend-production.up.railway.app/api/Sneaker/GetAllNoDiscount');
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             const data = await response.json();
-            setAllSneakers(data); // Set all sneakers from API
-            setFilteredResults(data); // Initially set all sneakers as filtered results
+            setAllProducts(data);
+            setFilteredResults(data);
         } catch (error) {
-            console.error("Error fetching all sneakers:", error);
+            console.error("Error fetching products:", error);
         }
     };
-  
-
-    const fetchSneakersByName = async (name) => {
-        try {
-            const response = await fetch('https://sneakers-backend-production.up.railway.app/api/Sneaker/GetByName?name=${name}');
-            if (!response.ok) {
-                throw new Error("HTTP Error! Status: ${response.status}");
-            }
-            const data = await response.json();
-            setFilteredResults(data);
-        } catch (error) {
-            console.error("Error al traer las zapatillas:", error);
-        }
-    }
-
-    const fetchSneakersBySize = async (size) => {
-        try {
-            const response = await fetch('https://sneakers-backend-production.up.railway.app/api/Sneaker/GetBySize?size=${size}');
-            if (!response.ok) {
-                throw new Error("HTTP Error! Status: ${response.status}");
-            }
-            const data = await response.json();
-            setFilteredResults(data);
-        } catch (error) {
-            console.error("Error al traer las zapatillas:", error);
-        }
-    }
 
     useEffect(() => {
-        fetchAllSneakers(); // Fetch all sneakers when the component mounts
+        fetchAllProducts();
     }, []);
 
     const handleFilter = () => {
-        let filteredData = allSneakers;
+        let filteredData = allProducts;
 
         if (name.trim()) {
-            filteredData = filteredData.filter((zapatilla) =>
-                zapatilla.name.toLowerCase().includes(name.trim().toLowerCase())
+            filteredData = filteredData.filter((producto) =>
+                producto.name.toLowerCase().includes(name.trim().toLowerCase())
             );
         }
 
         if (size) {
-            filteredData = filteredData.filter((zapatilla) =>
-                zapatilla.sizes.some((s) => s.size === parseInt(size))
+            filteredData = filteredData.filter((producto) =>
+                producto.sizes && producto.sizes.some((s) => s.size === parseInt(size))
             );
         }
 
-        setFilteredResults(filteredData); // Update filtered results based on name and size
+        setFilteredResults(filteredData);
     };
 
     return (
         <div className="wraper">
-            {/*<h1 id="tableLabel">Weather forecast</h1>*/}
-            {/*<p>This component demonstrates fetching data from the server.</p>*/}
-            {/*{contents}*/}
             <div className="searchbar-container">
-                {/* Barra de búsqueda por nombre */}
                 <input
                     type="text"
                     placeholder="Buscar por nombre"
@@ -88,7 +55,6 @@ const Home = () => {
                     className="form-control mb-2 mb-sm-0 me-sm-2"
                 />
 
-                {/* Barra de búsqueda por talle */}
                 <select
                     value={size}
                     onChange={(e) => setSize(e.target.value)}
@@ -101,9 +67,7 @@ const Home = () => {
                         </option>
                     ))}
                 </select>
-                
 
-                {/* Botón para filtrar */}
                 <button
                     onClick={handleFilter}
                     className="btn btn-primary"
@@ -111,15 +75,18 @@ const Home = () => {
                     Buscar
                 </button>
             </div>
+
             <div className="results-container">
                 {filteredResults.length > 0 ? (
-                    filteredResults.map((zapatilla) => <Card key={zapatilla.id} zapatilla={zapatilla} />)
+                    filteredResults.map((producto) => (
+                        <Card key={producto.id} producto={producto} />
+                    ))
                 ) : (
                     <p>No se encontraron resultados.</p>
                 )}
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default Home;
