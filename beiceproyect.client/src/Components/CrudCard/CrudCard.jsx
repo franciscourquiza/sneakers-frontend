@@ -2,14 +2,25 @@
 import { useState } from "react";
 import "./CrudCard.css";
 
-const CrudCard = ({ zapatilla, onUpdate }) => {
+const endpointMap = {
+    Sneaker: "Sneaker",
+    Clothe: "Clothe",
+    Cap: "Cap"
+};
+
+const CrudCard = ({ producto, onUpdate }) => {
     const [isEditing, setIsEditing] = useState(false);
+
+    const isSneakerOrClothe = producto.category === "Sneaker" || producto.category === "Clothe";
+
     const [editedData, setEditedData] = useState({
-        name: zapatilla.name,
-        price: zapatilla.price,
-        imageUrl: zapatilla.imageUrl,
-        sizes: zapatilla.sizes.map(s => s.size).join(", "),
-        isInDiscount: zapatilla.isInDiscount // Incluir la propiedad de liquidación
+        name: producto.name,
+        price: producto.price,
+        imageUrl: producto.imageUrl,
+        sizes: isSneakerOrClothe
+            ? producto.sizes.map(s => s.size).join(", ")
+            : producto.sizes ?? "",
+        isInDiscount: producto.isInDiscount
     });
 
     const handleEditClick = () => {
@@ -19,11 +30,13 @@ const CrudCard = ({ zapatilla, onUpdate }) => {
     const handleCancelEdit = () => {
         setIsEditing(false);
         setEditedData({
-            name: zapatilla.name,
-            price: zapatilla.price,
-            imageUrl: zapatilla.imageUrl,
-            sizes: zapatilla.sizes.map(s => s.size).join(", "),
-            isInDiscount: zapatilla.isInDiscount
+            name: producto.name,
+            price: producto.price,
+            imageUrl: producto.imageUrl,
+            sizes: isSneakerOrClothe
+                ? producto.sizes.map(s => s.size).join(", ")
+                : producto.sizes ?? "",
+            isInDiscount: producto.isInDiscount
         });
     };
 
@@ -31,7 +44,6 @@ const CrudCard = ({ zapatilla, onUpdate }) => {
         setEditedData({ ...editedData, [e.target.name]: e.target.value });
     };
 
-    // Manejo específico para el checkbox
     const handleCheckboxChange = (e) => {
         setEditedData({
             ...editedData,
@@ -41,60 +53,99 @@ const CrudCard = ({ zapatilla, onUpdate }) => {
 
     const handleSaveEdit = async () => {
         try {
-            const response = await fetch(`https://sneakers-backend-production.up.railway.app/api/Sneaker/EditById?id=${zapatilla.id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    name: editedData.name,
-                    price: parseFloat(editedData.price),
-                    imageUrl: editedData.imageUrl,
-                    sizes: editedData.sizes.split(",").map(size => parseInt(size.trim())),
-                    isInDiscount: editedData.isInDiscount  // Enviar la propiedad de liquidación
-                }),
-            });
+            // Normalización:
+            const normalizedCategory = producto.category?.charAt(0).toUpperCase() + producto.category?.slice(1).toLowerCase();
+            const endpoint = endpointMap[normalizedCategory];
 
-            if (!response.ok) {
-                throw new Error("Error al actualizar la sneaker");
+            const category = producto.category;
+           
+
+            const body = {
+                name: editedData.name,
+                price: parseFloat(editedData.price),
+                imageUrl: editedData.imageUrl,
+                isInDiscount: editedData.isInDiscount,
+            };
+
+            if (isSneakerOrClothe) {
+                body.sizes = editedData.sizes
+                    .split(",")
+                    .map(s => parseInt(s.trim()))
+                    .filter(n => !isNaN(n));
+            } else {
+                body.size = editedData.sizes;
             }
 
-            alert("Sneaker actualizada correctamente.");
+            const response = await fetch(
+                `https://sneakers-backend-production.up.railway.app/api/${endpoint}/EditById?id=${producto.id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(body),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Error al actualizar el producto");
+            }
+
+            alert("Producto actualizado correctamente.");
             onUpdate();
             setIsEditing(false);
         } catch (error) {
-            console.error("Error actualizando sneaker:", error);
-            alert("Hubo un error al actualizar la sneaker.");
+            console.error("Error actualizando producto:", error);
+            alert("Hubo un error al actualizar el producto.");
         }
     };
 
     const handleDelete = async () => {
-        const confirmDelete = window.confirm(`¿Seguro que quieres eliminar ${zapatilla.name}?`);
+        const confirmDelete = window.confirm(`¿Seguro que quieres eliminar ${producto.name}?`);
         if (!confirmDelete) return;
 
         try {
-            const response = await fetch(`https://sneakers-backend-production.up.railway.app/api/Sneaker/DeleteById?id=${zapatilla.id}`, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+            const normalizedCategory =
+                producto.category.charAt(0).toUpperCase() + producto.category.slice(1).toLowerCase();
+
+            const endpointMap = {
+                Sneaker: "Sneaker",
+                Clothe: "Clothe",
+                Cap: "Cap"
+            };
+
+            const endpoint = endpointMap[normalizedCategory];
+
+            const response = await fetch(
+                `https://sneakers-backend-production.up.railway.app/api/${endpoint}/DeleteById?id=${producto.id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
 
             if (!response.ok) {
-                throw new Error("Error al eliminar la sneaker");
+                throw new Error("Error al eliminar el producto");
             }
 
-            alert("Sneaker eliminada correctamente.");
-            onUpdate();
+            alert("Producto eliminado correctamente.");
+
+            if (typeof onUpdate === "function") {
+                onUpdate(); // Actualiza la lista en el componente padre
+            }
+
         } catch (error) {
-            console.error("Error eliminando sneaker:", error);
-            alert("Hubo un error al eliminar la sneaker.");
+            console.error("Error eliminando producto:", error);
+            alert("Hubo un error al eliminar el producto.");
         }
     };
 
+
     return (
         <div className="card-container">
-            <img src={zapatilla.imageUrl} alt={zapatilla.name} className="card-image" />
+            <img src={producto.imageUrl} alt={producto.name} className="card-image" />
 
             {isEditing ? (
                 <div className="edit-form">
@@ -108,57 +159,69 @@ const CrudCard = ({ zapatilla, onUpdate }) => {
                     <input
                         type="number"
                         name="price"
-                        placeholder="Precio (Ej: '100.000') usar puntos"
+                        placeholder="Precio"
                         value={editedData.price}
                         onChange={handleInputChange}
                     />
-                    <input
-                        type="text"
-                        name="sizes"
-                        placeholder="Talles en EUR (separados por coma)"
-                        value={editedData.sizes}
-                        onChange={handleInputChange}
-                    />
+                    {isSneakerOrClothe || producto.category === "Cap" ? (
+                        <input
+                            type="text"
+                            name="sizes"
+                            placeholder="Talles (Ej: 42, 43...) o texto"
+                            value={editedData.sizes}
+                            onChange={handleInputChange}
+                        />
+                    ) : null}
                     <input
                         type="url"
                         name="imageUrl"
-                        placeholder="URL de la imagen (Link, usar resoluciones cuadradas en lo posible)"
+                        placeholder="URL de la imagen"
                         value={editedData.imageUrl}
                         onChange={handleInputChange}
                     />
-
-                    {/* Checkbox para Producto en Liquidación */}
-                    <div className="form-input">
-                        <label>
-                            <input
-                                type="checkbox"
-                                name="isInDiscount"
-                                checked={editedData.isInDiscount}
-                                onChange={handleCheckboxChange}
-                            />
-                            Producto en Liquidacion
-                        </label>
-                    </div>
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="isInDiscount"
+                            checked={editedData.isInDiscount}
+                            onChange={handleCheckboxChange}
+                        />
+                        Producto en Liquidación
+                    </label>
 
                     <div className="card-buttons">
-                        <button className="btn btn-save" onClick={handleSaveEdit}>Guardar</button>
-                        <button className="btn btn-cancel" onClick={handleCancelEdit}>Cancelar</button>
+                        <button className="btn btn-save" onClick={handleSaveEdit}>
+                            Guardar
+                        </button>
+                        <button className="btn btn-cancel" onClick={handleCancelEdit}>
+                            Cancelar
+                        </button>
                     </div>
                 </div>
             ) : (
                 <>
-                    <h4 className="card-name">{zapatilla.name}</h4>
-                    <h5 className="card-price">${zapatilla.price.toFixed(3)} ARS</h5>
-                    <div className="card-sizes">
-                        <p>Talles disponibles:</p>
-                        {zapatilla.sizes.map(s => (
-                            <p key={s.size}>{s.size} EUR ({s.size - 1} ARG)</p>
-                        ))}
-                    </div>
+                    <h4 className="card-name">{producto.name}</h4>
+                    <h5 className="card-price">${producto.price.toFixed(3)} ARS</h5>
+                    {isSneakerOrClothe || producto.category === "Cap" ? (
+                        <div className="card-sizes">
+                            <p>Talles:</p>
+                            {isSneakerOrClothe ? (
+                                producto.sizes.map(s => (
+                                    <p key={s.size}>{s.size} EUR ({s.size - 1} ARG)</p>
+                                ))
+                            ) : (
+                                <p>{producto.sizes}</p>
+                            )}
+                        </div>
+                    ) : null}
 
                     <div className="card-buttons">
-                        <button className="btn btn-edit" onClick={handleEditClick}>Editar</button>
-                        <button className="btn btn-delete" onClick={handleDelete}>Eliminar</button>
+                        <button className="btn btn-edit" onClick={handleEditClick}>
+                            Editar
+                        </button>
+                        <button className="btn btn-delete" onClick={handleDelete}>
+                            Eliminar
+                        </button>
                     </div>
                 </>
             )}
@@ -167,3 +230,4 @@ const CrudCard = ({ zapatilla, onUpdate }) => {
 };
 
 export default CrudCard;
+

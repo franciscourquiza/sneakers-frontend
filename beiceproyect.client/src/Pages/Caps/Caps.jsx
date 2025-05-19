@@ -1,73 +1,52 @@
 import { useState, useEffect } from 'react';
-import './Home.css';
+import './Caps.css';
 import Card from '../../Components/Card/Card';
 
 
-const Home = () => {
+const Caps = () => {
     const [filteredResults, setFilteredResults] = useState([]);
-    const [allSneakers, setAllSneakers] = useState([]);
+    const [allCaps, setAllCaps] = useState([]);
     const [name, setName] = useState("");
-    const [size, setSize] = useState("");
 
- 
-    const fetchAllSneakers = async () => {
+
+    const fetchAllCaps = async () => {
         try {
-            const response = await fetch('https://sneakers-backend-production.up.railway.app/api/Sneaker/GetAll');
+            const response = await fetch('https://sneakers-backend-production.up.railway.app/api/Cap/GetAll');
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             const data = await response.json();
-            console.log(data);
-            setAllSneakers(data); // Set all sneakers from API
+            setAllCaps(data); // Set all sneakers from API
             setFilteredResults(data); // Initially set all sneakers as filtered results
         } catch (error) {
             console.error("Error fetching all sneakers:", error);
         }
     };
-  
 
-    const fetchSneakersByName = async (name) => {
+
+    const fetchCapsByName = async (name) => {
         try {
-            const response = await fetch('https://sneakers-backend-production.up.railway.app/api/Sneaker/GetByName?name=${name}');
+            const response = await fetch('https://sneakers-backend-production.up.railway.app/api/Cap/GetByName?name=${name}');
             if (!response.ok) {
-                throw new Error("HTTP Error! Status: ${response.status}");
+                throw new Error(`HTTP Error! Status: ${response.status}`);
             }
             const data = await response.json();
             setFilteredResults(data);
         } catch (error) {
-            console.error("Error al traer las zapatillas:", error);
-        }
-    }
-
-    const fetchSneakersBySize = async (size) => {
-        try {
-            const response = await fetch('https://sneakers-backend-production.up.railway.app/api/Sneaker/GetBySize?size=${size}');
-            if (!response.ok) {
-                throw new Error("HTTP Error! Status: ${response.status}");
-            }
-            const data = await response.json();
-            setFilteredResults(data);
-        } catch (error) {
-            console.error("Error al traer las zapatillas:", error);
+            console.error("Error al traer la ropa:", error);
         }
     }
 
     useEffect(() => {
-        fetchAllSneakers(); // Fetch all sneakers when the component mounts
+        fetchAllCaps(); // Fetch all sneakers when the component mounts
     }, []);
 
     const handleFilter = () => {
-        let filteredData = allSneakers;
+        let filteredData = allCaps;
 
         if (name.trim()) {
             filteredData = filteredData.filter((producto) =>
                 producto.name.toLowerCase().includes(name.trim().toLowerCase())
-            );
-        }
-
-        if (size) {
-            filteredData = filteredData.filter((producto) =>
-                producto.sizes.some((s) => s.size === parseInt(size))
             );
         }
 
@@ -89,21 +68,6 @@ const Home = () => {
                     className="form-control mb-2 mb-sm-0 me-sm-2"
                 />
 
-                {/* Barra de búsqueda por talle */}
-                <select
-                    value={size}
-                    onChange={(e) => setSize(e.target.value)}
-                    className="form-select mb-2 mb-sm-0 me-sm-2"
-                >
-                    <option value="">Seleccionar talle</option>
-                    {Array.from({ length: 11 }, (_, i) => 35 + i).map((t) => (
-                        <option key={t} value={t}>
-                            {t} EUR
-                        </option>
-                    ))}
-                </select>
-                
-
                 {/* Botón para filtrar */}
                 <button
                     onClick={handleFilter}
@@ -123,4 +87,4 @@ const Home = () => {
     )
 }
 
-export default Home;
+export default Caps;

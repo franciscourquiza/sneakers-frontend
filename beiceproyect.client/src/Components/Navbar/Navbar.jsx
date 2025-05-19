@@ -13,7 +13,7 @@ const Navbar = () => {
         <nav className="navbar">
             <div>
                 <ul className="navbar-title">
-                    <li><a href="" className="title" onClick={closeMobileMenu}>Calzado Importado</a></li>
+                    <li><a href="" className="title" onClick={closeMobileMenu}>Sneakers</a></li>
                 </ul>
             </div>
 
@@ -23,7 +23,9 @@ const Navbar = () => {
 
             <div>
                 <ul className={click ? "navbar-right active" : "navbar-right"}>
-                    <li><Link to="/home" onClick={closeMobileMenu}>Zapatillas</Link></li>
+                    <li><Link to="/home" onClick={closeMobileMenu}>Sneakers</Link></li>
+                    <li><Link to="/clothes" onClick={closeMobileMenu}>Clothes</Link></li>
+                    <li><Link to="/caps" onClick={closeMobileMenu}>Caps</Link></li>
                     <li><Link to="/discounts" onClick={closeMobileMenu}>Liquidacion</Link></li>
                     <li><Link to="/sizestable" onClick={closeMobileMenu}>Tabla de Talles</Link></li>
                     <li><Link to="/adminpanel" onClick={closeMobileMenu}>Panel</Link></li>

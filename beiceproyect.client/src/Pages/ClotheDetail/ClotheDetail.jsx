@@ -1,48 +1,43 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
+import "./ClotheDetail.css"
 import { FaWhatsapp } from "react-icons/fa";
-import "./SneakerDetail.css";
 
-const SneakerDetail = () => {
+const ClotheDetail = () => {
     const { id } = useParams();
-    const [sneaker, setSneaker] = useState(null);
+    const [clothe, setClothe] = useState(null);
 
     useEffect(() => {
-        const fetchSneaker = async () => {
+        const fetchClothe = async () => {
             try {
-                const response = await fetch(
-                    `https://sneakers-backend-production.up.railway.app/api/Sneaker/GetById?id=${id}`
-                );
+                const response = await fetch(`https://sneakers-backend-production.up.railway.app/api/Clothe/GetById?id=${id}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 const data = await response.json();
-                setSneaker(data);
+                console.log(data);
+                setClothe(data);
             } catch (error) {
                 console.error("Error fetching sneaker details:", error);
             }
-        };
-        fetchSneaker();
+        }
+        fetchClothe();
     }, [id]);
 
-    if (!sneaker) {
+    if (!clothe) {
         return <p>Cargando...</p>;
     }
 
     return (
         <div className="sneaker-detail-container">
             <div className="image-container">
-                <img src={sneaker.imageUrl} alt={sneaker.name} className="sneaker-image" />
+                <img src={clothe.imageUrl} alt={clothe.name} className="sneaker-image" />
             </div>
             <div className="info-container">
-                <h2>{sneaker.name}</h2>
-                <p className="price">Precio: ${sneaker.price.toFixed(3)} ARS</p>
+                <h2>{clothe.name}</h2>
+                <p className="price">Precio: ${clothe.price.toFixed(3)} ARS</p>
                 <div className="sizes">
-                    {sneaker.sizes.map((size) => (
-                        <div key={size.size} className="size-badge in-stock">
-                            {`En stock Talle ${size.size} EUR (${size.size - 1} ARG)`}
-                        </div>
-                    ))}
+                    <p className="sizes">Talles:{clothe.size}</p>
                 </div>
 
                 {/* Botón WhatsApp justo debajo de talles */}
@@ -58,8 +53,7 @@ const SneakerDetail = () => {
                 </a>
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default SneakerDetail;
-
+export default ClotheDetail;

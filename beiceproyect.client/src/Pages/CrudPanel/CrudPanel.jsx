@@ -6,13 +6,16 @@ import CrudCard from '../../Components/CrudCard/CrudCard';
 
 const CrudPanel = ({ setIsAuthenticated }) => {
     const navigate = useNavigate();
-    const [isAdding, setIsAdding] = useState(false); // Estado para el formulario de agregar
+    const [isAdding, setIsAdding] = useState(false);
+    const [addCategory, setAddCategory] = useState(''); // 'sneaker' | 'clothe' | 'cap'
+
     const [newSneaker, setNewSneaker] = useState({
         name: '',
         price: '',
         sizes: '',
+        size: '', // para clothe
         imageUrl: '',
-        isInDiscount: false  // Nueva propiedad para liquidación
+        isInDiscount: false,  // para sneaker y clothe
     });
 
     const signOutClicked = () => {
@@ -20,25 +23,33 @@ const CrudPanel = ({ setIsAuthenticated }) => {
         localStorage.setItem('isAuthenticated', 'false');
         setIsAuthenticated(false);
         navigate("/home");
-    }
+    };
 
     const [filteredResults, setFilteredResults] = useState([]);
-    const [allSneakers, setAllSneakers] = useState([]);
+    const [allProducts, setAllProducts] = useState([]);
     const [name, setName] = useState("");
     const [size, setSize] = useState("");
 
-    const fetchAllSneakers = async () => {
+    const fetchAllProducts = async () => {
         try {
-            const response = await fetch(`https://sneakers-backend-production.up.railway.app/api/Sneaker/GetAll`);
+            const response = await fetch('https://sneakers-backend-production.up.railway.app/api/Sneaker/GetAllTheProducts');
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
+
             const data = await response.json();
-            setAllSneakers(data); // Set all sneakers from API
-            setFilteredResults(data); // Initially set all sneakers as filtered results
-            console.log(data);
+
+            // Agregar la propiedad category a cada tipo de producto
+            const sneakers = data.sneakers.map(p => ({ ...p, category: 'sneaker' }));
+            const clothes = data.clothes.map(p => ({ ...p, category: 'clothe' }));
+            const caps = data.caps.map(p => ({ ...p, category: 'cap' }));
+
+            const all = [...sneakers, ...clothes, ...caps];
+
+            setAllProducts(all);
+            setFilteredResults(all);
         } catch (error) {
-            console.error("Error fetching all sneakers:", error);
+            console.error("Error fetching discounted products:", error);
         }
     };
 
@@ -53,7 +64,7 @@ const CrudPanel = ({ setIsAuthenticated }) => {
         } catch (error) {
             console.error("Error al traer las zapatillas:", error);
         }
-    }
+    };
 
     const fetchSneakersBySize = async (size) => {
         try {
@@ -66,14 +77,24 @@ const CrudPanel = ({ setIsAuthenticated }) => {
         } catch (error) {
             console.error("Error al traer las zapatillas:", error);
         }
-    }
+    };
 
     useEffect(() => {
-        fetchAllSneakers(); // Fetch all sneakers when the component mounts
+        fetchAllProducts(); // Fetch all products when the component mounts
     }, []);
 
-    const handleAddSneaker = () => {
+    const handleAddProduct = (category) => {
+        setAddCategory(category);
         setIsAdding(true);
+        // Limpiar formulario al cambiar categoría
+        setNewSneaker({
+            name: '',
+            price: '',
+            sizes: '',
+            size: '',
+            imageUrl: '',
+            isInDiscount: false,
+        });
     };
 
     const handleCancelAdd = () => {
@@ -82,8 +103,9 @@ const CrudPanel = ({ setIsAuthenticated }) => {
             name: '',
             price: '',
             sizes: '',
+            size: '',
             imageUrl: '',
-            isInDiscount: false
+            isInDiscount: false,
         });
     };
 
@@ -94,7 +116,6 @@ const CrudPanel = ({ setIsAuthenticated }) => {
         });
     };
 
-    // Manejo específico para el checkbox
     const handleCheckboxChange = (e) => {
         setNewSneaker({
             ...newSneaker,
@@ -103,51 +124,69 @@ const CrudPanel = ({ setIsAuthenticated }) => {
     };
 
     const handleFilter = () => {
-        let filteredData = allSneakers;
+        let filteredData = allProducts;
 
         if (name.trim()) {
-            filteredData = filteredData.filter((zapatilla) =>
-                zapatilla.name.toLowerCase().includes(name.trim().toLowerCase())
+            filteredData = filteredData.filter((producto) =>
+                producto.name.toLowerCase().includes(name.trim().toLowerCase())
             );
         }
 
         if (size) {
-            filteredData = filteredData.filter((zapatilla) =>
-                zapatilla.sizes.some((s) => s.size === parseInt(size))
-            );
+            filteredData = filteredData.filter((producto) => {
+                if (producto.category === 'sneaker' && Array.isArray(producto.sizes)) {
+                    return producto.sizes.some((s) => s.size === parseInt(size));
+                }
+                return false; // No mostrar otros productos si estás filtrando por talle
+            });
         }
+
 
         setFilteredResults(filteredData); // Update filtered results based on name and size
     };
 
     const handleSaveAdd = async () => {
         try {
-            const response = await fetch(`https://sneakers-backend-production.up.railway.app/api/Sneaker/Create`, {
+            const body = {
+                name: newSneaker.name,
+                price: parseFloat(newSneaker.price),
+                imageUrl: newSneaker.imageUrl,
+            };
+
+            if (addCategory === 'sneaker') {
+                body.sizes = newSneaker.sizes.split(',').map(size => parseInt(size.trim()));
+                body.isInDiscount = newSneaker.isInDiscount;
+            } else if (addCategory === 'clothe') {
+                body.size = newSneaker.size;  // talla como string
+                body.isInDiscount = newSneaker.isInDiscount;
+            }
+            // cap no tiene talle ni descuento
+
+            const endpointMap = {
+                sneaker: 'Sneaker',
+                clothe: 'Clothe',
+                cap: 'Cap',
+            };
+
+            console.log(body);
+            const response = await fetch(`https://sneakers-backend-production.up.railway.app/api/${endpointMap[addCategory]}/Create`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name: newSneaker.name,
-                    price: parseFloat(newSneaker.price),
-                    sizes: newSneaker.sizes.split(',').map(size => parseInt(size.trim())),
-                    imageUrl: newSneaker.imageUrl,
-                    isInDiscount: newSneaker.isInDiscount // Enviar la propiedad de liquidación
-                }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
             });
 
             if (!response.ok) {
                 throw new Error('Error al agregar el producto');
             }
 
-            alert('Sneaker agregada correctamente');
+            alert(`${addCategory} agregado correctamente`);
             setIsAdding(false);
-            fetchAllSneakers(); // Actualiza la lista de sneakers después de agregar
+            fetchAllProducts();
         } catch (error) {
-            console.error('Error agregando sneaker:', error);
-            alert('Hubo un error al agregar la sneaker');
+            console.error(`Error agregando ${addCategory}:`, error);
+            alert('Hubo un error al agregar el producto');
         }
-    }
+    };
 
     return (
         <div className="wraper">
@@ -155,15 +194,21 @@ const CrudPanel = ({ setIsAuthenticated }) => {
             <div className="logout-button">
                 <button className="button" onClick={signOutClicked}>Cerrar Sesion</button>
             </div>
-            <button onClick={handleAddSneaker} className="btn btn-add">Agregar Producto +</button>
+
+            <div className="add-buttons">
+                <button onClick={() => handleAddProduct('sneaker')} className="btn btn-add">Agregar Sneaker +</button>
+                <button onClick={() => handleAddProduct('clothe')} className="btn btn-add">Agregar Prenda +</button>
+                <button onClick={() => handleAddProduct('cap')} className="btn btn-add">Agregar Gorra +</button>
+            </div>
 
             {isAdding && (
                 <div className="add-form">
-                    <h4>Agregar nuevo producto</h4>
+                    <h4>Agregar nueva {addCategory === 'sneaker' ? 'Sneaker' : addCategory === 'clothe' ? 'Prenda' : 'Gorra'}</h4>
+
                     <input
                         type="text"
                         name="name"
-                        placeholder="Nombre"
+                        placeholder="Nombre del producto"
                         value={newSneaker.name}
                         onChange={handleInputChange}
                         className="form-input"
@@ -171,40 +216,58 @@ const CrudPanel = ({ setIsAuthenticated }) => {
                     <input
                         type="number"
                         name="price"
-                        placeholder="Precio (Ej: 100.000) usar puntos cada 3 digitos"
+                        placeholder="Precio (Ej: 100.000)"
                         value={newSneaker.price}
                         onChange={handleInputChange}
                         className="form-input"
                     />
-                    <input
-                        type="text"
-                        name="sizes"
-                        placeholder="Talles en EUR (separados por coma, Ejemplo: 40, 41, 42)"
-                        value={newSneaker.sizes}
-                        onChange={handleInputChange}
-                        className="form-input"
-                    />
+
+                    {/* Talles segun categoria */}
+                    {addCategory === 'sneaker' && (
+                        <input
+                            type="text"
+                            name="sizes"
+                            placeholder="Talles en EUR (Ej: 40, 41, 42)"
+                            value={newSneaker.sizes}
+                            onChange={handleInputChange}
+                            className="form-input"
+                        />
+                    )}
+
+                    {addCategory === 'clothe' && (
+                        <input
+                            type="text"
+                            name="size"
+                            placeholder="Talle (Ej: S, M, L)"
+                            value={newSneaker.size}
+                            onChange={handleInputChange}
+                            className="form-input"
+                        />
+                    )}
+
                     <input
                         type="url"
                         name="imageUrl"
-                        placeholder="URL de la imagen (Link, usar resoluciones cuadradas en lo posible, 400px X 400px por ejemplo)"
+                        placeholder="URL de la imagen (Ej: 400px X 400px)"
                         value={newSneaker.imageUrl}
                         onChange={handleInputChange}
                         className="form-input"
                     />
 
-                    {/* Nuevo checkbox para "Producto en Liquidación" */}
-                    <div className="form-input">
-                        <label>
-                            <input
-                                type="checkbox"
-                                name="isInDiscount"
-                                checked={newSneaker.isInDiscount}
-                                onChange={handleCheckboxChange}
-                            />
-                            Producto en Liquidacion(Tildar la opcion para agregar el producto en la seccion "Liquidacion")
-                        </label>
-                    </div>
+                    {/* Checkbox */}
+                    {(addCategory === 'sneaker' || addCategory === 'clothe' || addCategory === 'cap') && (
+                        <div className="form-input">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="isInDiscount"
+                                    checked={newSneaker.isInDiscount}
+                                    onChange={handleCheckboxChange}
+                                />
+                                Producto en Liquidacion
+                            </label>
+                        </div>
+                    )}
 
                     <div className="form-buttons">
                         <button onClick={handleSaveAdd} className="btn btn-save">Guardar</button>
@@ -232,30 +295,30 @@ const CrudPanel = ({ setIsAuthenticated }) => {
                     <option value="">Seleccionar talle</option>
                     {Array.from({ length: 11 }, (_, i) => 35 + i).map((t) => (
                         <option key={t} value={t}>
-                            {t}
+                            {t} EUR
                         </option>
                     ))}
                 </select>
 
-                {/* Botón para filtrar */}
-                <button
-                    onClick={handleFilter}
-                    className="btn btn-primary"
-                >
-                    Buscar
-                </button>
+                <button onClick={handleFilter} className="btn btn-primary">Buscar</button>
             </div>
+
             <div className="results-container">
                 {filteredResults.length > 0 ? (
-                    filteredResults.map((zapatilla) => (
-                        <CrudCard key={zapatilla.id} zapatilla={zapatilla} onUpdate={fetchAllSneakers} />
+                    filteredResults.map((producto) => (
+                        <CrudCard
+                            key={`${producto.id}-${producto.category}`}
+                            producto={producto}
+                            onUpdate={fetchAllProducts}
+                        />
                     ))
                 ) : (
-                    <p>No se encontraron resultados.</p>
+                    <p>No se encontraron productos.</p>
                 )}
             </div>
         </div>
     );
-}
+};
 
 export default CrudPanel;
+

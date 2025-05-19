@@ -14,6 +14,10 @@ h3 {
     padding: 15px;
 }
 
+.add-buttons button {
+    margin: 20px
+}
+
 .add-form {
     width: 70%;
     /*max-width: 400px;*/
