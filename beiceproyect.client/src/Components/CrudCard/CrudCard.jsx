@@ -3,23 +3,25 @@ import { useState } from "react";
 import "./CrudCard.css";
 
 const endpointMap = {
-    Sneaker: "Sneaker",
-    Clothe: "Clothe",
-    Cap: "Cap"
+    Sneaker: "sneaker",
+    Clothe: "clothe",
+    Cap: "cap"
 };
 
 const CrudCard = ({ producto, onUpdate }) => {
     const [isEditing, setIsEditing] = useState(false);
 
-    const isSneakerOrClothe = producto.category === "Sneaker" || producto.category === "Clothe";
-
     const [editedData, setEditedData] = useState({
         name: producto.name,
         price: producto.price,
         imageUrl: producto.imageUrl,
-        sizes: isSneakerOrClothe
-            ? producto.sizes.map(s => s.size).join(", ")
-            : producto.sizes ?? "",
+        sizes: producto.category === "sneaker"
+            ? Array.isArray(producto.sizes)
+                ? producto.sizes.map(s => s.size).join(", ")
+                : ""
+            : producto.category === "clothe"
+                ? producto.size ?? ""
+                : producto.sizes ?? "",
         isInDiscount: producto.isInDiscount
     });
 
@@ -33,9 +35,13 @@ const CrudCard = ({ producto, onUpdate }) => {
             name: producto.name,
             price: producto.price,
             imageUrl: producto.imageUrl,
-            sizes: isSneakerOrClothe
-                ? producto.sizes.map(s => s.size).join(", ")
-                : producto.sizes ?? "",
+            sizes: producto.category === "sneaker"
+                ? Array.isArray(producto.sizes)
+                    ? producto.sizes.map(s => s.size).join(", ")
+                    : ""
+                : producto.category === "clothe"
+                    ? producto.size ?? ""
+                    : producto.sizes ?? "",
             isInDiscount: producto.isInDiscount
         });
     };
@@ -53,12 +59,8 @@ const CrudCard = ({ producto, onUpdate }) => {
 
     const handleSaveEdit = async () => {
         try {
-            // Normalización:
             const normalizedCategory = producto.category?.charAt(0).toUpperCase() + producto.category?.slice(1).toLowerCase();
             const endpoint = endpointMap[normalizedCategory];
-
-            const category = producto.category;
-           
 
             const body = {
                 name: editedData.name,
@@ -67,11 +69,13 @@ const CrudCard = ({ producto, onUpdate }) => {
                 isInDiscount: editedData.isInDiscount,
             };
 
-            if (isSneakerOrClothe) {
+            if (producto.category === "sneaker") {
                 body.sizes = editedData.sizes
                     .split(",")
                     .map(s => parseInt(s.trim()))
                     .filter(n => !isNaN(n));
+            } else if (producto.category === "clothe") {
+                body.size = editedData.sizes.trim();
             } else {
                 body.size = editedData.sizes;
             }
@@ -108,12 +112,6 @@ const CrudCard = ({ producto, onUpdate }) => {
             const normalizedCategory =
                 producto.category.charAt(0).toUpperCase() + producto.category.slice(1).toLowerCase();
 
-            const endpointMap = {
-                Sneaker: "Sneaker",
-                Clothe: "Clothe",
-                Cap: "Cap"
-            };
-
             const endpoint = endpointMap[normalizedCategory];
 
             const response = await fetch(
@@ -142,7 +140,6 @@ const CrudCard = ({ producto, onUpdate }) => {
         }
     };
 
-
     return (
         <div className="card-container">
             <img src={producto.imageUrl} alt={producto.name} className="card-image" />
@@ -163,7 +160,7 @@ const CrudCard = ({ producto, onUpdate }) => {
                         value={editedData.price}
                         onChange={handleInputChange}
                     />
-                    {isSneakerOrClothe || producto.category === "Cap" ? (
+                    {(producto.category === "sneaker" || producto.category === "clothe" || producto.category === "cap") && (
                         <input
                             type="text"
                             name="sizes"
@@ -171,7 +168,7 @@ const CrudCard = ({ producto, onUpdate }) => {
                             value={editedData.sizes}
                             onChange={handleInputChange}
                         />
-                    ) : null}
+                    )}
                     <input
                         type="url"
                         name="imageUrl"
@@ -202,18 +199,23 @@ const CrudCard = ({ producto, onUpdate }) => {
                 <>
                     <h4 className="card-name">{producto.name}</h4>
                     <h5 className="card-price">${producto.price.toFixed(3)} ARS</h5>
-                    {isSneakerOrClothe || producto.category === "Cap" ? (
+
+                    {(producto.category === "sneaker" || producto.category === "clothe" || producto.category === "cap") && (
                         <div className="card-sizes">
                             <p>Talles:</p>
-                            {isSneakerOrClothe ? (
-                                producto.sizes.map(s => (
-                                    <p key={s.size}>{s.size} EUR ({s.size - 1} ARG)</p>
-                                ))
+                            {producto.category === "sneaker" ? (
+                                Array.isArray(producto.sizes) && producto.sizes.length > 0 ? (
+                                    producto.sizes.map((s, index) => (
+                                        <p key={index}>{s.size} EUR ({s.size - 1} ARG)</p>
+                                    ))
+                                ) : (
+                                    <p>No hay talles cargados</p>
+                                )
                             ) : (
-                                <p>{producto.sizes}</p>
+                                <p>{producto.size || producto.sizes || "No hay talles cargados"}</p>
                             )}
                         </div>
-                    ) : null}
+                    )}
 
                     <div className="card-buttons">
                         <button className="btn btn-edit" onClick={handleEditClick}>
@@ -230,4 +232,3 @@ const CrudCard = ({ producto, onUpdate }) => {
 };
 
 export default CrudCard;
-
